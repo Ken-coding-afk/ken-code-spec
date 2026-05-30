@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ken Code Spec"
+  short_description: "初始化跨工具 Agent 入口和 spec 文档骨架"
+  default_prompt: "为当前项目初始化 Ken Code Spec 协作基线：补齐 AGENTS.md、CLAUDE.md、Cursor rules、README.md 和 docs/spec-* 文档骨架，保留已有内容且不要覆盖用户文件。"
