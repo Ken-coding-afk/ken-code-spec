@@ -33,6 +33,7 @@ assets/project-template/
 ├── .cursor/
 │   ├── mcp.json
 │   └── rules/
+│       ├── codegraph-first.mdc
 │       └── karpathy-guidelines.mdc
 └── docs/
     ├── README.md
