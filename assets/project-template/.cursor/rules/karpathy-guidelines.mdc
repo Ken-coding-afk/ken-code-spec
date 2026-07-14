@@ -1,79 +1,50 @@
 ---
-description: Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.
+description: 编码、修复和重构时使用的轻量规则：先给简略方案，保持简单和精准修改，代码完成后集中补单元测试并统一运行，大改动先写方案与执行文档。
 alwaysApply: true
 ---
 
-# Karpathy behavioral guidelines
+# Karpathy 轻量编码规则
 
-Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
+## 1. 先思考，再执行
 
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+- 动手前明确目标、约束、影响范围和验证方式。
+- 实际操作前用 3～6 条给出简略方案。
+- 存在多种解释时说明差异，不静默选择。
+- 涉及删除、覆盖、不可逆操作或重大取舍时等待确认。
 
-## 1. Think Before Coding
+## 2. 简单和精准
 
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
+- 只实现明确要求，不添加推测性功能。
+- 不为一次性逻辑提前抽象，不顺手重构无关代码。
+- 遵循现有风格，只清理由本次改动产生的无用内容。
+- 每一处改动都应能追溯到用户目标、必要测试或直接文档更新。
 
-Before implementing:
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them - don't pick silently.
-- If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
+## 3. 大改动文档
 
-## 2. Simplicity First
+跨 3 个及以上逻辑模块，或修改架构、公共 API、数据库、认证权限、构建部署、迁移回滚时，按大改动处理。用户明确要求设计或执行计划时也按大改动处理。
 
-**Minimum code that solves the problem. Nothing speculative.**
+编码前创建并确认：
 
-- No features beyond what was asked.
-- No abstractions for single-use code.
-- No "flexibility" or "configurability" that wasn't requested.
-- No error handling for impossible scenarios.
-- If you write 200 lines and it could be 50, rewrite it.
+- `docs/plans/YYYY-MM-DD-主题-design.md`
+- `docs/plans/YYYY-MM-DD-主题-implementation.md`
 
-Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+优先使用 `docs/plans/` 下的模板。普通改动不创建正式方案文档。
 
-## 3. Surgical Changes
+## 4. 测试后置，集中运行
 
-**Touch only what you must. Clean up only your own mess.**
+- 新增或修改可测试行为时，必须新增或更新单元测试。
+- 先完成当前任务的全部代码，再集中编写或更新测试。
+- 不要每写一个类、函数、文件或测试就立即运行。
+- 代码和测试完成后，先统一运行受影响模块测试，再运行项目完整测试套件。
+- 最后运行适用的类型检查、Lint 和构建。
+- 修复失败时可以局部重跑；最终仍需再次运行完整测试。
+- 不得删除测试、弱化断言或跳过测试来制造通过。
+- 不默认采用 TDD，除非用户明确要求。
 
-When editing existing code:
-- Don't "improve" adjacent code, comments, or formatting.
-- Don't refactor things that aren't broken.
-- Match existing style, even if you'd do it differently.
-- If you notice unrelated dead code, mention it - don't delete it.
+纯文档、注释、格式、静态资源和不改变行为的配置修改可以不新增单元测试。完整测试无法运行时，说明原因和未验证范围。
 
-When your changes create orphans:
-- Remove imports/variables/functions that YOUR changes made unused.
-- Don't remove pre-existing dead code unless asked.
+## 5. 完成汇报
 
-The test: Every changed line should trace directly to the user's request.
-
-## 4. Goal-Driven Execution
-
-**Define success criteria. Loop until verified.**
-
-Transform tasks into verifiable goals:
-- "Add validation" → "Write tests for invalid inputs, then make them pass"
-- "Fix the bug" → "Write a test that reproduces it, then make it pass"
-- "Refactor X" → "Ensure tests pass before and after"
-
-For multi-step tasks, state a brief plan:
-```
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
-```
-
-Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
-
-## 5. Testing Policy
-
-- Do not run tests after every class, method, file, or small change.
-- Finish all code changes for the current task first, then run tests only if needed.
-- For simple changes, do not run tests automatically; just suggest the relevant test command in the final response.
-- If tests are needed, run the smallest relevant test set only.
-- Do not run the full test suite unless the user explicitly asks or the change is high-risk.
-- Do not use TDD unless the user explicitly asks for it.
-
----
-
-**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+- 汇报实际修改、测试命令、真实结果和遗留风险。
+- 大改动只在阶段边界更新执行文档，不记录逐文件流水账。
+- 未验证内容必须明确说明。
