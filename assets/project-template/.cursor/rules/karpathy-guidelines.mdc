@@ -1,50 +1,55 @@
 ---
-description: 编码、修复和重构时使用的轻量规则：先给简略方案，保持简单和精准修改，代码完成后集中补单元测试并统一运行，大改动先写方案与执行文档。
+description: Lightweight rules for coding, fixes, and refactors: plan briefly, keep changes simple and surgical, write unit tests after implementation, run tests in one final batch, and document large changes before coding.
 alwaysApply: true
 ---
 
-# Karpathy 轻量编码规则
+# Karpathy lightweight coding rules
 
-## 1. 先思考，再执行
+## 1. Language
 
-- 动手前明确目标、约束、影响范围和验证方式。
-- 实际操作前用 3～6 条给出简略方案。
-- 存在多种解释时说明差异，不静默选择。
-- 涉及删除、覆盖、不可逆操作或重大取舍时等待确认。
+- Respond in Chinese by default and write project documentation primarily in Chinese.
+- Keep code identifiers, commands, paths, and established technical terms in their conventional form.
 
-## 2. 简单和精准
+## 2. Think before acting
 
-- 只实现明确要求，不添加推测性功能。
-- 不为一次性逻辑提前抽象，不顺手重构无关代码。
-- 遵循现有风格，只清理由本次改动产生的无用内容。
-- 每一处改动都应能追溯到用户目标、必要测试或直接文档更新。
+- Define the goal, constraints, impact, and verification before making changes.
+- Present a brief plan of 3–6 items before actionable work.
+- Surface competing interpretations instead of choosing silently.
+- Wait for confirmation before deletion, overwrite, irreversible action, or a major tradeoff.
 
-## 3. 大改动文档
+## 3. Keep changes simple and surgical
 
-跨 3 个及以上逻辑模块，或修改架构、公共 API、数据库、认证权限、构建部署、迁移回滚时，按大改动处理。用户明确要求设计或执行计划时也按大改动处理。
+- Implement only what the user requested. Do not add speculative features.
+- Avoid abstractions for one-off logic and do not refactor unrelated code.
+- Match existing style and remove only unused content introduced by the current change.
+- Make every changed line trace to the request, a required test, or a direct documentation update.
 
-编码前创建并确认：
+## 4. Document large changes
+
+Treat work spanning three or more logical modules, or changing architecture, public APIs, databases, authentication, authorization, build, deployment, migration, or rollback as a large change. Also treat explicit requests for design or implementation plans as large changes.
+
+Create and approve before coding:
 
 - `docs/plans/YYYY-MM-DD-主题-design.md`
 - `docs/plans/YYYY-MM-DD-主题-implementation.md`
 
-优先使用 `docs/plans/` 下的模板。普通改动不创建正式方案文档。
+Use the templates in `docs/plans/`. Do not create formal planning documents for ordinary changes.
 
-## 4. 测试后置，集中运行
+## 5. Implement first, then test in one batch
 
-- 新增或修改可测试行为时，必须新增或更新单元测试。
-- 先完成当前任务的全部代码，再集中编写或更新测试。
-- 不要每写一个类、函数、文件或测试就立即运行。
-- 代码和测试完成后，先统一运行受影响模块测试，再运行项目完整测试套件。
-- 最后运行适用的类型检查、Lint 和构建。
-- 修复失败时可以局部重跑；最终仍需再次运行完整测试。
-- 不得删除测试、弱化断言或跳过测试来制造通过。
-- 不默认采用 TDD，除非用户明确要求。
+- Add or update unit tests for every new or changed testable behavior.
+- Finish all code for the current task before writing or updating tests.
+- Do not run tests after every class, function, file, or individual test.
+- After code and tests are complete, run affected-module tests and then the complete project test suite.
+- Finish with applicable type checks, lint, and build.
+- During failure repair, run focused tests as needed; after the fix, run the complete suite again.
+- Never delete tests, weaken assertions, or skip tests merely to make them pass.
+- Do not use TDD unless the user explicitly requests test-first development.
 
-纯文档、注释、格式、静态资源和不改变行为的配置修改可以不新增单元测试。完整测试无法运行时，说明原因和未验证范围。
+Documentation, comments, formatting, static assets, and behavior-neutral configuration changes do not require new unit tests. When the complete suite cannot run, explain why and state the unverified scope.
 
-## 5. 完成汇报
+## 6. Complete and report
 
-- 汇报实际修改、测试命令、真实结果和遗留风险。
-- 大改动只在阶段边界更新执行文档，不记录逐文件流水账。
-- 未验证内容必须明确说明。
+- Report actual changes, test commands, real results, and remaining risks.
+- For large changes, update the implementation document only at phase boundaries, not after each file.
+- State anything not verified.

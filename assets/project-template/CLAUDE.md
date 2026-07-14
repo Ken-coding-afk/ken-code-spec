@@ -1,65 +1,65 @@
 # CLAUDE.md
 
-本项目采用轻量、可验证的编码工作方式。项目中的更具体规则优先于本文件。
+Use a lightweight, verifiable coding workflow. More specific project rules override this file.
 
-## 1. 先思考，再执行
+## 1. Language
 
-- 动手前先明确目标、约束、影响范围和验证方式。
-- 对需要实际操作的任务，先用 3～6 条给出简略方案。
-- 存在多种合理解释时，说明差异；关键事实不清时先询问。
-- 涉及删除、覆盖、外部发送、不可逆操作或重大取舍时，等待用户确认。
-- 纯问答和简单查询不强制使用计划格式。
+- Respond in Chinese by default unless the user requests another language.
+- Write project documentation primarily in Chinese.
+- Keep code identifiers, commands, paths, and established technical terms in their conventional form.
 
-## 2. 简单优先
+## 2. Think before acting
 
-- 只实现当前明确要求，不增加推测性的功能。
-- 不为一次性逻辑提前抽象，不添加未要求的可配置能力。
-- 优先选择代码更少、依赖更少、影响面更小的方案。
-- 如果实现明显比问题本身复杂，先重新检查设计。
+- Define the goal, constraints, impact, and verification before making changes.
+- For actionable work, first present a brief plan of 3–6 items.
+- Surface competing interpretations instead of choosing silently. Ask when a missing fact changes the result.
+- Wait for confirmation before deletion, overwrite, external communication, irreversible action, or a major tradeoff.
+- Skip the plan format for pure explanations and simple lookups.
 
-## 3. 精准修改
+## 3. Keep changes simple and surgical
 
-- 只修改与任务直接相关的文件和代码。
-- 不顺手重构无关模块，不统一无关格式，不删除既有死代码。
-- 遵循项目现有命名、结构和风格。
-- 清理由本次修改直接产生的无用导入、变量和函数。
+- Implement only what the user requested. Do not add speculative features or configurability.
+- Avoid abstractions for one-off logic. Prefer fewer lines, fewer dependencies, and a smaller impact surface.
+- Modify only files and code directly relevant to the task.
+- Do not refactor adjacent modules, normalize unrelated formatting, or delete pre-existing dead code.
+- Match existing naming, structure, and style. Remove only unused code introduced by the current change.
 
-每一处改动都应能追溯到用户目标、必要的测试或直接文档更新。
+Every changed line must trace to the request, a required test, or a direct documentation update.
 
-## 4. 区分普通改动和大改动
+## 4. Distinguish ordinary and large changes
 
-满足任意一项即按大改动处理：
+Treat a task as a large change when any condition applies:
 
-- 跨越 3 个及以上逻辑模块或服务。
-- 修改架构、核心数据流或模块边界。
-- 修改公共 API、数据库、认证、权限、构建或部署方式。
-- 涉及迁移、兼容、灰度或回滚。
-- 大规模重构，可能改变既有行为。
-- 用户明确要求方案文档、设计文档或执行计划。
+- It spans three or more logical modules or services.
+- It changes architecture, core data flow, or module boundaries.
+- It changes a public API, database, authentication, authorization, build, or deployment behavior.
+- It requires migration, compatibility, staged rollout, or rollback planning.
+- It is a large refactor that can change existing behavior.
+- The user explicitly requests a design document or implementation plan.
 
-大改动编码前必须创建：
+Before coding a large change, create:
 
 - `docs/plans/YYYY-MM-DD-主题-design.md`
 - `docs/plans/YYYY-MM-DD-主题-implementation.md`
 
-优先使用 `docs/plans/` 下的模板。两份文档可以一起提交确认；确认前不要开始大规模编码。普通改动不创建正式方案文档。
+Use the templates in `docs/plans/`. Present both documents together for approval and do not start large-scale coding before approval. Do not create formal planning documents for ordinary changes.
 
-## 5. 编码与测试
+## 5. Implement first, then test in one batch
 
-- 凡新增或修改可测试的程序行为，必须新增或更新对应单元测试。
-- 默认测试后置：先完成当前任务的全部代码，再集中编写或更新测试。
-- 不要每写一个类、函数、文件或测试就立即运行一次。
-- 代码和测试完成后，先统一运行受影响模块测试，再运行项目完整测试套件。
-- 最后运行适用的类型检查、Lint 和构建。
-- 修复失败时可以局部重跑；完成修复后必须再次运行完整测试套件。
-- 不得删除测试、弱化断言、跳过测试或修改正确预期来制造通过。
-- 不默认采用 TDD；只有用户明确要求时才测试先行。
+- Add or update unit tests for every new or changed testable behavior.
+- Finish all code for the current task before writing or updating tests.
+- Do not run tests after every class, function, file, or individual test.
+- After code and tests are complete, run affected-module tests and then the complete project test suite.
+- Finish with applicable type checks, lint, and build.
+- During failure repair, run focused tests as needed; after the fix, run the complete suite again.
+- Never delete tests, weaken assertions, skip tests, or change a correct expectation merely to make tests pass.
+- Do not use TDD unless the user explicitly requests test-first development.
 
-纯文档、注释、格式、静态资源和不改变行为的配置修改可以不新增单元测试，但仍要执行适用检查。完整测试无法运行时，说明原因并明确未验证范围。
+Documentation, comments, formatting, static assets, and behavior-neutral configuration changes do not require new unit tests, but still require applicable checks. When the complete suite cannot run, explain why and state the unverified scope.
 
-## 6. 完成与汇报
+## 6. Complete and report
 
-- 对照简略方案或执行文档检查实际完成范围。
-- 汇报修改内容、测试命令、真实结果和遗留风险。
-- 大改动只在阶段边界更新执行文档，不记录逐文件流水账。
-- 未验证的内容必须明确说明，不用推测性语言宣称完成。
+- Compare the result with the brief plan or implementation document.
+- Report actual changes, test commands, real results, and remaining risks.
+- For large changes, update the implementation document only at phase boundaries, not after each file.
+- State anything not verified. Do not claim completion based on assumption.

@@ -1,92 +1,92 @@
 ---
 name: ken-code-spec
-description: 提供 Ken 风格的轻量编码工作流与跨工具项目模板。用于初始化或刷新 Codex、Claude Code、Cursor 的协作入口；也用于按“先给简略方案、完成代码后集中补单元测试、最后统一运行完整测试”的方式实现功能、修复缺陷或重构。涉及跨模块、架构、公共 API、数据库、权限、部署、迁移或大规模重构时，使用固定模板创建方案文档和执行文档。
+description: Use for Ken-style lightweight coding workflows and cross-tool project setup for Codex, Claude Code, and Cursor. Trigger when initializing or refreshing agent entrypoints, implementing features, fixing bugs, or refactoring with a brief plan before action, unit tests written after implementation, and one consolidated final test run. For cross-module, architecture, public API, database, auth, deployment, migration, or large refactoring changes, create design and implementation documents from the bundled templates.
 ---
 
 # Ken Code Spec
 
-用一个轻量 Skill 统一项目初始化和编码执行。普通任务保持简短；只有大改动才进入正式文档流程。不要自动引入子 Agent、Worktree、TDD 或多阶段评审。
+Use one lightweight skill for project setup and code execution. Keep ordinary tasks short. Use formal documents only for large changes. Do not introduce subagents, worktrees, TDD, or multi-stage review unless the user explicitly asks.
 
-## 核心原则
+## Core rules
 
-- 以中文为主，先说明判断，再执行操作。
-- 动手前给出 3～6 条简略方案，至少包含目标、改动范围和验证方式。
-- 优先选择解决当前问题的最小方案，不实现未要求的扩展能力。
-- 只修改与任务直接相关的内容，保留项目现有风格和用户已有规则。
-- 用户明确要求高于本 Skill 的默认流程。
+- Respond in Chinese by default and write project documentation primarily in Chinese.
+- Before taking action, give a brief plan of 3–6 items covering the goal, change scope, and verification.
+- Choose the smallest solution that satisfies the current request. Do not add speculative capabilities.
+- Change only what is directly relevant. Preserve existing project style and user-owned rules.
+- Let explicit user instructions override this workflow.
 
-纯问答和简单查询无需套用计划格式。涉及删除、覆盖、外部发送、不可逆操作或重大技术取舍时，给出方案后等待用户确认。
+Skip the plan format for pure explanations and simple lookups. After presenting the plan, wait for confirmation before deletion, overwrite, external communication, irreversible action, or a major technical tradeoff.
 
-## 选择工作路径
+## Select a workflow
 
-### 初始化或刷新项目
+### Initialize or refresh a project
 
-仅在用户要求初始化、补齐或同步项目协作基线时执行：
+Run this workflow only when the user asks to initialize, complete, or synchronize the collaboration baseline:
 
-1. 扫描项目根目录的 `AGENTS.md`、`CLAUDE.md`、`.cursor/`、`README.md` 和 `docs/`。
-2. 从 `assets/project-template/` 原样复制缺失文件，保留相对路径。
-3. 默认只补缺失内容，不覆盖现有文件；替换必须来自用户明确要求。
-4. 新增或重命名文档后，同步更新 `docs/README.md`。
-5. 不替用户编造项目事实；占位文档保持简短。
+1. Inspect `AGENTS.md`, `CLAUDE.md`, `.cursor/`, `README.md`, and `docs/` at the project root.
+2. Copy missing files from `assets/project-template/` without rewriting them. Preserve relative paths.
+3. Add missing content only. Never overwrite an existing file without explicit user authorization.
+4. Update `docs/README.md` after adding or renaming documentation.
+5. Keep placeholders short and never invent project facts.
 
-不要因为一次普通编码任务而自动初始化整个项目。
+Do not initialize the whole project merely because the user requested an ordinary code change.
 
-### 实现、修复或重构代码
+### Implement, fix, or refactor code
 
-先判断任务属于普通改动还是大改动，再选择对应流程。
+Classify the task as an ordinary or large change before proceeding.
 
-## 判断大改动
+## Classify large changes
 
-满足任意一项即按大改动处理：
+Treat the task as a large change when any condition applies:
 
-- 跨越 3 个及以上逻辑模块或服务。
-- 修改系统架构、核心数据流或模块边界。
-- 修改公共 API、数据库结构、认证、权限、构建或部署方式。
-- 涉及数据迁移、兼容策略、灰度发布或回滚方案。
-- 大规模重构，可能改变既有行为。
-- 用户明确要求方案文档、设计文档或执行计划。
+- It spans three or more logical modules or services.
+- It changes architecture, core data flow, or module boundaries.
+- It changes a public API, database schema, authentication, authorization, build, or deployment behavior.
+- It requires migration, compatibility, staged rollout, or rollback planning.
+- It is a large refactor that can change existing behavior.
+- The user explicitly requests a design document or implementation plan.
 
-不要只按文件数量判断。影响面明确且局部的改动仍按普通改动处理。
+Do not classify by file count alone. Keep a clearly bounded local change in the ordinary workflow.
 
-## 普通改动流程
+## Ordinary change workflow
 
-1. 阅读必要上下文，明确成功标准和测试范围。
-2. 给出简略方案；意图清楚且风险低时可以继续执行，无需重复确认。
-3. 完成当前任务的全部代码改动。
-4. 为新增或修改的可测试行为集中新增或更新单元测试。
-5. 统一运行受影响模块测试，再运行项目完整测试套件及适用的类型检查、Lint、构建。
-6. 汇报实际修改、测试命令、结果和未验证项。
+1. Read only the context needed to define success criteria and the test scope.
+2. Present a brief plan. Continue without another confirmation when intent is clear and risk is low.
+3. Finish all code changes for the current task.
+4. Add or update unit tests in one batch for every new or changed testable behavior.
+5. Run affected-module tests, then the complete project test suite, followed by applicable type checks, lint, and build.
+6. Report the actual changes, commands, results, and anything not verified.
 
-不要每写一个类、函数、文件或测试就运行一次。修复测试失败时可以局部重跑；完成修复后仍要再跑一次完整测试套件。
+Do not run tests after every class, function, file, or test. During failure repair, run focused tests as needed; after the fix, run the complete suite again.
 
-## 大改动流程
+## Large change workflow
 
-1. 分析现状、影响面、约束和可选方案，先给出简略方案。
-2. 如果项目已有文档规范，优先遵循；否则基于以下模板创建：
+1. Analyze the current state, impact, constraints, and viable options. Present a brief plan first.
+2. Follow an existing project documentation convention when available. Otherwise use:
    - `assets/project-template/docs/plans/_design-template.md`
    - `assets/project-template/docs/plans/_implementation-template.md`
-3. 将文档保存为：
+3. Save the documents as:
    - `docs/plans/YYYY-MM-DD-主题-design.md`
    - `docs/plans/YYYY-MM-DD-主题-implementation.md`
-4. 一次性提交两份文档供用户确认；确认前不要开始大规模编码。
-5. 按执行文档完成全部代码，在阶段边界更新清单，不记录逐文件流水账。
-6. 代码完成后集中编写或更新单元测试。
-7. 统一运行模块测试、完整测试套件和适用检查，并把真实结果回填执行文档。
+4. Present both documents together for approval. Do not start large-scale coding before approval.
+5. Implement all code according to the implementation document. Update it only at phase boundaries, not after every file.
+6. Add or update unit tests in one batch after implementation is complete.
+7. Run module tests, the complete suite, and applicable checks together. Record real results in the implementation document.
 
-方案文档回答“为什么改、改成什么样、有什么风险”；执行文档回答“怎么改、按什么顺序、如何验证”。避免在两份文档中重复同一内容。
+Use the design document for why, the target design, and risks. Use the implementation document for how, execution order, and verification. Avoid duplicating the same content in both.
 
-## 测试政策
+## Testing policy
 
-- 凡新增或修改可测试的程序行为，必须新增或更新对应单元测试。
-- 默认测试后置：先完成整个任务的代码，再集中编写测试并统一运行。
-- 不默认采用 TDD；只有用户明确要求时才测试先行。
-- 不得删除测试、弱化断言、跳过测试或修改正确预期来制造通过。
-- 纯文档、注释、格式、静态资源以及不改变程序行为的配置修改可以不新增单元测试，但仍要执行适用检查。
-- 完整测试无法运行或耗时明显不合理时，说明原因，执行当前条件下最接近的验证，并明确未验证范围。
+- Require new or updated unit tests for every new or changed testable behavior.
+- Use test-last by default: finish the task implementation, then write tests and run them together.
+- Do not use TDD unless the user explicitly requests test-first development.
+- Never delete tests, weaken assertions, skip tests, or change a correct expectation merely to obtain a passing result.
+- Exempt documentation, comments, formatting, static assets, and configuration changes that do not affect behavior from new unit tests; still run applicable checks.
+- When the complete suite cannot run or has clearly unreasonable cost, explain why, run the closest available verification, and state the unverified scope.
 
-## 模板结构
+## Template layout
 
-项目模板位于 `assets/project-template/`：
+Use the project template in `assets/project-template/`:
 
 ```text
 assets/project-template/
@@ -112,10 +112,10 @@ assets/project-template/
     └── changes/README.md
 ```
 
-## 完成标准
+## Completion criteria
 
-- 修改范围与用户目标一致，没有顺手重构无关代码。
-- 行为变化有对应单元测试或明确、合理的豁免说明。
-- 最终验证集中执行，结果真实可追溯。
-- 大改动的方案和执行文档已确认，并记录最终验证结果。
-- 项目初始化只补缺失内容，未覆盖用户已有规则。
+- Keep changes aligned with the request and avoid unrelated refactors.
+- Cover behavioral changes with unit tests or a clear, valid exemption.
+- Run final verification in one consolidated phase and report traceable results.
+- For a large change, obtain approval for both documents and record final verification.
+- During setup, add only missing files and preserve all user-owned rules.
