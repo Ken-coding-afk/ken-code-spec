@@ -1,4 +1,4 @@
 interface:
   display_name: "Ken Code Spec"
-  short_description: "初始化跨工具规则，并执行轻量规划、集中测试与大改动文档流程"
-  default_prompt: "使用 $ken-code-spec 按轻量方案、测试后置和大改动双文档规则完成当前编码任务。"
+  short_description: "先讨论并确认方案，再写文档和代码"
+  default_prompt: "使用 $ken-code-spec 先和我讨论并确认方案，再按轻量流程完成当前编码任务。"

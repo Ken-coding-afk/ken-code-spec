@@ -1,6 +1,6 @@
 ---
 name: ken-code-spec
-description: Use for Ken-style lightweight coding workflows and cross-tool project setup for Codex, Claude Code, and Cursor. Trigger when initializing or refreshing agent entrypoints, implementing features, fixing bugs, or refactoring with a brief plan before action, unit tests written after implementation, and one consolidated final test run. For cross-module, architecture, public API, database, auth, deployment, migration, or large refactoring changes, create design and implementation documents from the bundled templates.
+description: Use for Ken-style lightweight coding workflows and cross-tool project setup for Codex, Claude Code, and Cursor. Trigger when initializing or refreshing agent entrypoints, implementing features, fixing bugs, or refactoring. Keep ordinary changes lightweight with a brief plan, test-last unit tests, and one consolidated final verification. For ambiguous or large changes involving cross-module work, architecture, public APIs, databases, auth, deployment, migration, or major refactoring, discuss the proposed solution with the user and obtain explicit confirmation before writing design or implementation documents or starting large-scale coding.
 ---
 
 # Ken Code Spec
@@ -10,12 +10,30 @@ Use one lightweight skill for project setup and code execution. Keep ordinary ta
 ## Core rules
 
 - Respond in Chinese by default and write project documentation primarily in Chinese.
-- Before taking action, give a brief plan of 3–6 items covering the goal, change scope, and verification.
+- Before taking action, give a brief plan of 3–5 items covering the goal, change scope, and verification.
 - Choose the smallest solution that satisfies the current request. Do not add speculative capabilities.
 - Change only what is directly relevant. Preserve existing project style and user-owned rules.
 - Let explicit user instructions override this workflow.
+- Treat solution discussion, document approval, and implementation as separate stages. Do not silently collapse them into one step.
 
 Skip the plan format for pure explanations and simple lookups. After presenting the plan, wait for confirmation before deletion, overwrite, external communication, irreversible action, or a major technical tradeoff.
+
+## Discuss before documenting
+
+For every large change, ambiguous requirement, or consequential technical choice, discuss the solution in chat before creating or updating design and implementation documents.
+
+1. Inspect enough current context to understand the existing behavior and constraints.
+2. Present a concise proposal in chat covering:
+   - the understood goal and non-goals;
+   - the current-state findings that affect the solution;
+   - the recommended approach and key tradeoffs;
+   - alternatives only when they lead to a materially different result;
+   - unresolved questions or assumptions that could change the design.
+3. Ask focused questions only for decisions that materially affect the solution. Include a recommendation when possible.
+4. Wait for explicit user confirmation of the proposed direction. A new requirement is not itself approval of a solution.
+5. If the user changes the direction, revise the conversational proposal and confirm again.
+
+Before confirmation, do not create or update plan documents and do not start large-scale coding. Do not present an internally generated document as a substitute for discussion. Skip this gate only when the user explicitly says to proceed without discussion or confirms that the solution has already been agreed.
 
 ## Select a workflow
 
@@ -52,26 +70,28 @@ Do not classify by file count alone. Keep a clearly bounded local change in the 
 
 1. Read only the context needed to define success criteria and the test scope.
 2. Present a brief plan. Continue without another confirmation when intent is clear and risk is low.
-3. Finish all code changes for the current task.
-4. Add or update unit tests in one batch for every new or changed testable behavior.
-5. Run affected-module tests, then the complete project test suite, followed by applicable type checks, lint, and build.
-6. Report the actual changes, commands, results, and anything not verified.
+3. If an unresolved choice would materially change behavior, use the discussion gate before coding.
+4. Finish all code changes for the current task.
+5. Add or update unit tests in one batch for every new or changed testable behavior.
+6. Run affected-module tests, then the complete project test suite, followed by applicable type checks, lint, and build.
+7. Report the actual changes, commands, results, and anything not verified.
 
 Do not run tests after every class, function, file, or test. During failure repair, run focused tests as needed; after the fix, run the complete suite again.
 
 ## Large change workflow
 
-1. Analyze the current state, impact, constraints, and viable options. Present a brief plan first.
-2. Follow an existing project documentation convention when available. Otherwise use:
+1. Analyze the current state, impact, constraints, and viable options.
+2. Complete the conversational solution discussion and obtain explicit confirmation as defined above.
+3. Only after confirmation, follow an existing project documentation convention when available. Otherwise use:
    - `assets/project-template/docs/plans/_design-template.md`
    - `assets/project-template/docs/plans/_implementation-template.md`
-3. Save the documents as:
+4. Save the documents as:
    - `docs/plans/YYYY-MM-DD-主题-design.md`
    - `docs/plans/YYYY-MM-DD-主题-implementation.md`
-4. Present both documents together for approval. Do not start large-scale coding before approval.
-5. Implement all code according to the implementation document. Update it only at phase boundaries, not after every file.
-6. Add or update unit tests in one batch after implementation is complete.
-7. Run module tests, the complete suite, and applicable checks together. Record real results in the implementation document.
+5. Present both documents together for approval. Do not start large-scale coding before document approval.
+6. Implement all code according to the implementation document. Update it only at phase boundaries, not after every file.
+7. Add or update unit tests in one batch after implementation is complete.
+8. Run module tests, the complete suite, and applicable checks together. Record real results in the implementation document.
 
 Use the design document for why, the target design, and risks. Use the implementation document for how, execution order, and verification. Avoid duplicating the same content in both.
 
@@ -117,5 +137,5 @@ assets/project-template/
 - Keep changes aligned with the request and avoid unrelated refactors.
 - Cover behavioral changes with unit tests or a clear, valid exemption.
 - Run final verification in one consolidated phase and report traceable results.
-- For a large change, obtain approval for both documents and record final verification.
+- For a large change, obtain solution confirmation before writing documents, then obtain document approval before implementation.
 - During setup, add only missing files and preserve all user-owned rules.
