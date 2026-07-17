@@ -1,5 +1,5 @@
 ---
-description: Lightweight rules for coding, fixes, and refactors: plan briefly, keep changes simple and surgical, write unit tests after implementation, run tests in one final batch, and document large changes before coding.
+description: Confirmation-gated rules for coding, fixes, and refactors: explain ordinary changes, create one plan document for large changes, ask the user about material uncertainty, test after implementation, and verify in one final batch.
 alwaysApply: true
 ---
 
@@ -13,9 +13,11 @@ alwaysApply: true
 ## 2. Think before acting
 
 - Define the goal, constraints, impact, and verification before making changes.
-- Present a brief plan of 3–6 items before actionable work.
-- Surface competing interpretations instead of choosing silently.
-- Wait for confirmation before deletion, overwrite, irreversible action, or a major tradeoff.
+- Inspect enough context to explain the intended change before editing.
+- Ask a focused question with a recommendation when a material requirement or technical choice cannot be determined confidently, then wait for the user's decision.
+- For ordinary changes, explain how the code will change and how it will be verified, then wait for explicit confirmation.
+- For large changes, create one plan document as described below, then wait for explicit confirmation.
+- Require confirmation after presenting the current proposal or plan. The original implementation request is not confirmation of material the user has not seen.
 
 ## 3. Keep changes simple and surgical
 
@@ -24,32 +26,32 @@ alwaysApply: true
 - Match existing style and remove only unused content introduced by the current change.
 - Make every changed line trace to the request, a required test, or a direct documentation update.
 
-## 4. Document large changes
+## 4. Plan large changes
 
 Treat work spanning three or more logical modules, or changing architecture, public APIs, databases, authentication, authorization, build, deployment, migration, or rollback as a large change. Also treat explicit requests for design or implementation plans as large changes.
 
-Create and approve before coding:
+Before coding, create `docs/plans/YYYY-MM-DD-主题-plan.md` from the template in `docs/plans/`. Cover the goal and scope, current state and constraints, chosen solution, impact surface, phased steps, verification and acceptance, risks and rollback, and an execution record.
 
-- `docs/plans/YYYY-MM-DD-主题-design.md`
-- `docs/plans/YYYY-MM-DD-主题-implementation.md`
-
-Use the templates in `docs/plans/`. Do not create formal planning documents for ordinary changes.
+Present the plan for explicit confirmation before implementation. Do not create separate design and implementation documents. Pause and ask the user whenever a material unresolved choice appears; update the plan and confirm again before continuing.
 
 ## 5. Implement first, then test in one batch
 
 - Add or update unit tests for every new or changed testable behavior.
 - Finish all code for the current task before writing or updating tests.
 - Do not run tests after every class, function, file, or individual test.
-- After code and tests are complete, run affected-module tests and then the complete project test suite.
+- Run only the test files, test cases, or filters directly related to the current change and its affected behavior.
+- In a monorepo, test only affected packages or workspaces unless a narrower selection is available.
+- Never run the complete project test suite unless the user explicitly requests it.
+- If the relevant test scope cannot be determined confidently, ask the user before expanding it.
 - Finish with applicable type checks, lint, and build.
-- During failure repair, run focused tests as needed; after the fix, run the complete suite again.
-- Never delete tests, weaken assertions, or skip tests merely to make them pass.
+- During failure repair, rerun only the related focused tests.
+- Never delete tests, weaken assertions, or disable relevant tests merely to make them pass.
 - Do not use TDD unless the user explicitly requests test-first development.
 
-Documentation, comments, formatting, static assets, and behavior-neutral configuration changes do not require new unit tests. When the complete suite cannot run, explain why and state the unverified scope.
+Documentation, comments, formatting, static assets, and behavior-neutral configuration changes do not require new unit tests. Report the exact tests run, why they were selected, and any related behavior not verified. When related tests cannot run, explain why and state the unverified scope.
 
 ## 6. Complete and report
 
 - Report actual changes, test commands, real results, and remaining risks.
-- For large changes, update the implementation document only at phase boundaries, not after each file.
+- For large changes, update the plan only at meaningful phase boundaries or when material findings change it.
 - State anything not verified.

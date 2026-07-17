@@ -1,39 +1,36 @@
 ---
 name: ken-code-spec
-description: Use for Ken-style lightweight coding workflows and cross-tool project setup for Codex, Claude Code, and Cursor. Trigger when initializing or refreshing agent entrypoints, implementing features, fixing bugs, or refactoring. Keep ordinary changes lightweight with a brief plan, test-last unit tests, and one consolidated final verification. For ambiguous or large changes involving cross-module work, architecture, public APIs, databases, auth, deployment, migration, or major refactoring, discuss the proposed solution with the user and obtain explicit confirmation before writing design or implementation documents or starting large-scale coding.
+description: Use for Ken-style confirmation-gated coding workflows and cross-tool project setup for Codex, Claude Code, and Cursor. Trigger when initializing or refreshing agent entrypoints, implementing features, fixing bugs, or refactoring. For ordinary changes, explain how the code will change and how it will be verified, then wait for explicit confirmation before editing. For large changes involving cross-module work, architecture, public APIs, databases, auth, deployment, migration, or major refactoring, resolve material uncertainties with the user, create one plan document under docs/plans/, and wait for explicit confirmation before implementation. Ask focused questions with a recommendation whenever requirements or technical choices cannot be determined confidently. Run only tests related to the current change; never run the complete test suite unless the user explicitly requests it.
 ---
 
 # Ken Code Spec
 
-Use one lightweight skill for project setup and code execution. Keep ordinary tasks short. Use formal documents only for large changes. Do not introduce subagents, worktrees, TDD, or multi-stage review unless the user explicitly asks.
+Use one lightweight, confirmation-gated skill for project setup and code execution. Keep ordinary tasks in chat. For large changes, use one confirmed plan document instead of separate design and implementation documents. Do not introduce subagents, worktrees, TDD, or multi-stage review unless the user explicitly asks.
 
 ## Core rules
 
 - Respond in Chinese by default and write project documentation primarily in Chinese.
-- Before taking action, give a brief plan of 3–5 items covering the goal, change scope, and verification.
+- Inspect enough context before proposing a change, but do not edit implementation files before the required confirmation.
 - Choose the smallest solution that satisfies the current request. Do not add speculative capabilities.
 - Change only what is directly relevant. Preserve existing project style and user-owned rules.
 - Let explicit user instructions override this workflow.
-- Treat solution discussion, document approval, and implementation as separate stages. Do not silently collapse them into one step.
+- Treat the proposal or plan and implementation as separate stages for every code change.
+- Treat only an explicit instruction such as “确认”“开始”“执行”“直接改” as authorization to implement the latest proposal or plan. A new requirement, clarification, or answer to a question is not implementation approval.
+- Require that authorization after the proposal or plan has been presented. Do not treat the original implementation request as confirmation of a proposal or plan the user has not seen.
 
-Skip the plan format for pure explanations and simple lookups. After presenting the plan, wait for confirmation before deletion, overwrite, external communication, irreversible action, or a major technical tradeoff.
+Skip the confirmation gate for pure explanations and simple lookups. Read-only inspection is allowed before confirmation. For a large change, creating or updating its plan document is also allowed before implementation confirmation.
 
-## Discuss before documenting
+## Resolve uncertainty first
 
-For every large change, ambiguous requirement, or consequential technical choice, discuss the solution in chat before creating or updating design and implementation documents.
+Do not guess when an unresolved requirement, solution choice, or implementation choice could materially change behavior, scope, compatibility, risk, or user experience.
 
 1. Inspect enough current context to understand the existing behavior and constraints.
-2. Present a concise proposal in chat covering:
-   - the understood goal and non-goals;
-   - the current-state findings that affect the solution;
-   - the recommended approach and key tradeoffs;
-   - alternatives only when they lead to a materially different result;
-   - unresolved questions or assumptions that could change the design.
-3. Ask focused questions only for decisions that materially affect the solution. Include a recommendation when possible.
-4. Wait for explicit user confirmation of the proposed direction. A new requirement is not itself approval of a solution.
-5. If the user changes the direction, revise the conversational proposal and confirm again.
+2. Ask only the focused questions needed for the user to decide. Explain the impact of the options and include a recommended choice when possible.
+3. Wait for the user's decision before finalizing the ordinary-change proposal or large-change plan.
+4. After the user decides, incorporate the decision and still wait for explicit implementation confirmation.
+5. If a material uncertainty appears during implementation, pause, ask the user, update the proposal or plan, and obtain confirmation again before continuing.
 
-Before confirmation, do not create or update plan documents and do not start large-scale coding. Do not present an internally generated document as a substitute for discussion. Skip this gate only when the user explicitly says to proceed without discussion or confirms that the solution has already been agreed.
+Do not ask about details that can be established safely from the repository or existing project conventions. Do not present unresolved material choices as assumptions inside a proposal or plan.
 
 ## Select a workflow
 
@@ -69,40 +66,44 @@ Do not classify by file count alone. Keep a clearly bounded local change in the 
 ## Ordinary change workflow
 
 1. Read only the context needed to define success criteria and the test scope.
-2. Present a brief plan. Continue without another confirmation when intent is clear and risk is low.
-3. If an unresolved choice would materially change behavior, use the discussion gate before coding.
-4. Finish all code changes for the current task.
-5. Add or update unit tests in one batch for every new or changed testable behavior.
-6. Run affected-module tests, then the complete project test suite, followed by applicable type checks, lint, and build.
-7. Report the actual changes, commands, results, and anything not verified.
+2. Resolve material uncertainties with the user as defined above.
+3. Present a concise change proposal in chat covering the intended result, affected files or modules, how the code will change, and how it will be verified.
+4. Wait for explicit confirmation. If the user changes the request, revise the proposal and confirm again.
+5. After confirmation, finish all code changes for the current task.
+6. Add or update unit tests in one batch for every new or changed testable behavior.
+7. Run only the test files, test cases, filters, or affected package/workspace tests directly related to the current change, followed by applicable type checks, lint, and build.
+8. Report the actual changes, commands, results, and anything not verified.
 
-Do not run tests after every class, function, file, or test. During failure repair, run focused tests as needed; after the fix, run the complete suite again.
+Do not run tests after every class, function, file, or test. During failure repair, rerun only the related focused tests. Do not run the complete test suite unless the user explicitly requests it.
 
 ## Large change workflow
 
 1. Analyze the current state, impact, constraints, and viable options.
-2. Complete the conversational solution discussion and obtain explicit confirmation as defined above.
-3. Only after confirmation, follow an existing project documentation convention when available. Otherwise use:
-   - `assets/project-template/docs/plans/_design-template.md`
-   - `assets/project-template/docs/plans/_implementation-template.md`
-4. Save the documents as:
-   - `docs/plans/YYYY-MM-DD-主题-design.md`
-   - `docs/plans/YYYY-MM-DD-主题-implementation.md`
-5. Present both documents together for approval. Do not start large-scale coding before document approval.
-6. Implement all code according to the implementation document. Update it only at phase boundaries, not after every file.
-7. Add or update unit tests in one batch after implementation is complete.
-8. Run module tests, the complete suite, and applicable checks together. Record real results in the implementation document.
+2. Resolve all material uncertainties with the user as defined above.
+3. Create `docs/plans/YYYY-MM-DD-主题-plan.md` from `assets/project-template/docs/plans/_plan-template.md` or the project's existing equivalent. Keep the initial plan concise, normally 1–3 pages.
+4. Include the goal and scope, current state and constraints, chosen solution, impact surface, phased implementation checklist, verification and acceptance, risks and rollback, and an execution record.
+5. Present the plan path and a concise summary, then wait for explicit confirmation. If the user changes the request, update the document and confirm again.
+6. After confirmation, implement according to the plan. Update it only when a phase completes or material findings require a change.
+7. If implementation uncovers a materially different architecture, behavior, risk, or scope, pause, resolve the decision with the user, revise the plan, and obtain confirmation again.
+8. Add or update unit tests in one batch after implementation is complete.
+9. Run only the tests related to the changed behaviors and affected modules or dependency boundaries, plus applicable checks. Record the selected test scope, real results, and remaining gaps in the same plan document.
+10. Report the completed plan items, verification results, deviations, and remaining risks.
 
-Use the design document for why, the target design, and risks. Use the implementation document for how, execution order, and verification. Avoid duplicating the same content in both.
+Do not create separate design and implementation documents. Create additional ADR, migration, or rollout documents only when the user explicitly requests them or an existing project rule requires them.
 
 ## Testing policy
 
 - Require new or updated unit tests for every new or changed testable behavior.
 - Use test-last by default: finish the task implementation, then write tests and run them together.
 - Do not use TDD unless the user explicitly requests test-first development.
-- Never delete tests, weaken assertions, skip tests, or change a correct expectation merely to obtain a passing result.
+- Select the narrowest test files, test names, or runner filters that cover the current change and its directly affected behavior.
+- In a monorepo, run tests only for affected packages or workspaces unless a narrower selection is available.
+- Never run the complete project test suite unless the user explicitly requests it.
+- If the relevant test scope cannot be determined confidently, ask the user before expanding it.
+- Never delete tests, weaken assertions, disable relevant tests, or change a correct expectation merely to obtain a passing result.
 - Exempt documentation, comments, formatting, static assets, and configuration changes that do not affect behavior from new unit tests; still run applicable checks.
-- When the complete suite cannot run or has clearly unreasonable cost, explain why, run the closest available verification, and state the unverified scope.
+- Report the exact tests run, why they were selected, their results, and any related behavior not verified.
+- When related tests cannot run, explain why, run the closest relevant verification, and state the unverified scope.
 
 ## Template layout
 
@@ -126,8 +127,7 @@ assets/project-template/
     ├── spec-glossary.md
     ├── plans/
     │   ├── README.md
-    │   ├── _design-template.md
-    │   └── _implementation-template.md
+    │   └── _plan-template.md
     ├── decisions/README.md
     └── changes/README.md
 ```
@@ -136,6 +136,7 @@ assets/project-template/
 
 - Keep changes aligned with the request and avoid unrelated refactors.
 - Cover behavioral changes with unit tests or a clear, valid exemption.
-- Run final verification in one consolidated phase and report traceable results.
-- For a large change, obtain solution confirmation before writing documents, then obtain document approval before implementation.
+- Run only change-related tests in one consolidated phase and report their selection, scope, and traceable results.
+- For an ordinary change, obtain confirmation of the chat proposal before editing.
+- For a large change, resolve material uncertainties, create one plan document, and obtain confirmation before implementation.
 - During setup, add only missing files and preserve all user-owned rules.
