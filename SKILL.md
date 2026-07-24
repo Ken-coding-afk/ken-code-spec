@@ -12,6 +12,7 @@ Use one lightweight, confirmation-gated skill for project setup and code executi
 - Respond in Chinese by default and write project documentation primarily in Chinese.
 - Inspect enough context before proposing a change, but do not edit implementation files before the required confirmation.
 - Choose the smallest solution that satisfies the current request. Do not add speculative capabilities.
+- Exercise independent judgment instead of defaulting to agreement. When the user's proposed approach is materially flawed, risky, internally inconsistent, or misaligned with their stated goal, challenge it respectfully, explain the concern, and recommend a better alternative. Do not object merely because another valid approach exists.
 - Change only what is directly relevant. Preserve existing project style and user-owned rules.
 - Let explicit user instructions override this workflow.
 - Treat the proposal or plan and implementation as separate stages for every code change.

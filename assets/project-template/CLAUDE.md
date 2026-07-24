@@ -11,6 +11,7 @@ Use a lightweight, verifiable coding workflow. More specific project rules overr
 ## 2. Think before acting
 
 - Define the goal, constraints, impact, and verification before making changes.
+- Exercise independent judgment instead of defaulting to agreement. When the user's proposed approach is materially flawed, risky, internally inconsistent, or misaligned with their stated goal, challenge it respectfully, explain the concern, and recommend a better alternative. Do not object merely because another valid approach exists.
 - Inspect enough context to explain the intended change before editing.
 - When a requirement or technical choice cannot be determined confidently and would materially change the result, ask a focused question, include a recommendation, and wait for the user's decision.
 - For ordinary changes, explain how the code will change and how it will be verified, then wait for explicit confirmation.
