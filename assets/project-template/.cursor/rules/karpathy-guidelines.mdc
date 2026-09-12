@@ -35,6 +35,17 @@ Before coding, create `docs/plans/YYYY-MM-DD-主题-plan.md` from the template i
 
 Present the plan for explicit confirmation before implementation. Do not create separate design and implementation documents. Pause and ask the user whenever a material unresolved choice appears; update the plan and confirm again before continuing.
 
+### 执行计划的交接标准
+
+- 面向未参与前期讨论的执行者编写。计划与指定仓库文件必须足以完成实现，不依赖聊天历史或规划者未写出的判断。
+- 不设固定页数。按行为复杂度细化，关键业务规则、模块职责、接口合同和核心算法必须在交接前确定；普通局部实现细节留给执行者。
+- 记录各受影响仓库的分支、HEAD 和相关未提交变更；提供经过核实的文件路径、符号及阅读目的。拟新增的路径和符号明确标注，不编造现有实现。
+- 使用 AC 编号表达可观察的验收结果。按独立行为和验证边界拆分 T 编号任务，写明依赖、仓库/文件/符号、具体改动、必要的逻辑或伪代码、必须保持的行为及完成证据；不要机械地按文件拆任务。
+- 涉及跨模块合同、状态、事务、并发、重试或取消时，明确生产者与消费者、检查及写入条件、失败后的状态和恢复方式。不适用时简述原因，不为填模板增加能力。
+- 提交确认前自检：每个 AC 都有实施任务和验证方法；每个任务都有明确入口；跨模块合同一致；关键失败路径和依赖已确定；不存在由执行者补做的重要设计决定。
+- 执行前只核对计划依赖的代码事实和相关变更，避免重新设计已确认方案。局部细节自行处理；若代码事实冲突或必须改变核心行为，记录具体差异、暂停受影响工作、修订计划并取得确认。不得静默改变方案或放宽验收。
+- 实施前确定测试场景、输入和预期结果；仍在实现完成后集中编写和运行相关测试。区分“已实现”与“已验证”，只用实际证据标记验收完成。
+
 ## 5. Implement first, then test in one batch
 
 - Add or update unit tests for every new or changed testable behavior.

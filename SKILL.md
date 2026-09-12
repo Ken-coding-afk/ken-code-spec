@@ -81,8 +81,8 @@ Do not run tests after every class, function, file, or test. During failure repa
 
 1. Analyze the current state, impact, constraints, and viable options.
 2. Resolve all material uncertainties with the user as defined above.
-3. Create `docs/plans/YYYY-MM-DD-主题-plan.md` from `assets/project-template/docs/plans/_plan-template.md` or the project's existing equivalent. Keep the initial plan concise, normally 1–3 pages.
-4. Include the goal and scope, current state and constraints, chosen solution, impact surface, phased implementation checklist, verification and acceptance, risks and rollback, and an execution record.
+3. Create `docs/plans/YYYY-MM-DD-主题-plan.md` from `assets/project-template/docs/plans/_plan-template.md` or the project's existing equivalent. Do not impose a page limit. Make the plan executable by someone without the prior conversation, following the handoff standards below.
+4. Include verified repository context, resolved design contracts, AC-numbered acceptance criteria, dependency-ordered T-numbered implementation tasks, focused verification, risks/recovery, and an execution record. Complete the handoff self-check before presenting the plan.
 5. Present the plan path and a concise summary, then wait for explicit confirmation. If the user changes the request, update the document and confirm again.
 6. After confirmation, implement according to the plan. Update it only when a phase completes or material findings require a change.
 7. If implementation uncovers a materially different architecture, behavior, risk, or scope, pause, resolve the decision with the user, revise the plan, and obtain confirmation again.
@@ -91,6 +91,36 @@ Do not run tests after every class, function, file, or test. During failure repa
 10. Report the completed plan items, verification results, deviations, and remaining risks.
 
 Do not create separate design and implementation documents. Create additional ADR, migration, or rollout documents only when the user explicitly requests them or an existing project rule requires them.
+
+## 编写可交接的执行计划
+
+大改动规划时读取计划模板，并遵守以下标准；普通改动不要求展开完整文档。
+
+- **上下文完整**：假设执行者没有聊天历史。记录受影响仓库的分支、HEAD、相关 dirty 基线，以及必读文件/符号和阅读目的。现有位置必须核实，拟新增位置明确标注；不复制整份源码。
+- **决策完成**：说明行为变化、模块职责、调用顺序、接口签名/字段约束和关键方案取舍。适用时写清状态转换、事务边界、错误、重试、取消、并发和恢复。实质未决项先澄清，不能以“按现有方式处理”代替调查和决定。
+- **任务可执行**：用 AC 编号定义可观察结果，用 T 编号拆分具有明确依赖的行为任务。每项写明仓库/文件/符号、具体改动、必要的伪代码或输入输出示例、必须保持的行为和完成证据。一个任务不应要求执行者重新设计核心数据流；不要按文件数或固定时长机械拆分。
+- **验收可追溯**：每个 AC 映射实施任务和测试/人工验证。实施前确定输入、预期结果、关键边界和测试位置；命令注明工作目录及环境前提。区分已存在与拟新增的测试，以及计划命令与实际执行结果。
+- **深度适当**：取消页数限制，以关键决策是否完成、任务是否可执行和结果是否可验证为准。普通局部细节由执行者决定，不预写全部代码。不适用的模板项简述原因，不新增用户未要求的架构、迁移或兼容逻辑。
+
+### 交接前自检
+
+在提交用户确认前，由规划者检查并补齐：
+
+1. 不读聊天历史也能理解目标、范围、约束和阅读入口。
+2. 每个 AC 都有实施任务和验证方法；每个任务都有明确入口、前置依赖和完成证据。
+3. 跨模块生产者与消费者的字段、状态和错误语义一致。
+4. 核心失败路径已确定，没有留待执行者选择的重要业务或技术方案。
+5. 验收预期独立于待实现代码，未把“测试通过”作为唯一完成定义。
+
+该自检不自动引入第二个 Agent、模型调用或额外审批。用户可选择由强模型规划、较弱模型实现，并由强模型审核关键差异；不要自行更换模型或创建任务。
+
+### 执行者与审核者
+
+执行者先核对计划依赖的代码事实和相关变更，再按任务依赖实现，避免重复全仓探索或重做已确认设计。若发现代码事实冲突、缺少前置能力，或必须改变核心行为才能继续，记录“计划预期 / 实际证据 / 影响 / 建议”，暂停受影响工作并返回规划阶段；实质修订仍需用户确认。普通局部细节自行处理。
+
+完成实现后集中补写并运行相关测试。按阶段记录已实现与已验证状态、实际命令和结果；不得静默改变合同、扩大范围或放宽验收。存在未验证项时不能宣称已全部完成。
+
+进行最终审核时，以 AC、关键设计约束和实际 diff/验证证据为依据，重点检查跨模块合同、失败路径和计划偏差，不仅检查任务是否打勾。未经用户要求，不自动发起独立审核 Agent。
 
 ## Testing policy
 
