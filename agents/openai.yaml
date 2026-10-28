@@ -1,4 +1,4 @@
 interface:
   display_name: "Ken Code Spec"
-  short_description: "所有代码改动先确认：小改动看修改说明，大改动看单一计划文档"
-  default_prompt: "使用 $ken-code-spec：小改动先说明怎么改，大改动先生成一份 plan 文档；遇到关键不确定项先问我，得到明确确认后再执行。"
+  short_description: "轻量协作：方案确认后简单实现，统一 AGENTS 入口并集中定向验证"
+  default_prompt: "使用 $ken-code-spec：沿用项目规则，小改动先说明方案，大改动先写可交接计划；确认后保持简单实现并集中验证，不重复询问已确认事项。"

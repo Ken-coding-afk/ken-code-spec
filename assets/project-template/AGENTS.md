@@ -1,79 +1,60 @@
 # AGENTS.md
 
-Use a lightweight, verifiable coding workflow. More specific project rules override this file.
+采用简单、可验证的协作方式；更具体的项目规则优先，用户明确指令优先于本文件。
 
-## 1. Language
+## 1. 沟通与确认
 
-- Respond in Chinese by default unless the user requests another language.
-- Write project documentation primarily in Chinese.
-- Keep code identifiers, commands, paths, and established technical terms in their conventional form.
+- 默认用中文沟通和写文档；代码标识、命令、路径及技术术语保持惯用形式。
+- 先检查相关事实，再说明目标、改动范围和验证方法。保留无关的本地修改，不顺手重构、清理或统一格式。
+- 独立判断：方案有实质错误、风险或与目标冲突时，说明依据并给出建议；不因存在另一种可行做法就反对。
+- 普通修改先在对话中说明方案，得到确认后实施；大改动先按第 3 节编写计划，再确认。原始需求不等于对尚未展示方案的确认；纯解释和只读检查无需确认。
+- 大改动包括：跨三个及以上逻辑模块/服务；改变架构、核心数据流、模块边界、公共 API、数据库、认证授权、构建部署；涉及迁移兼容或回退；改变行为的大重构；用户要求设计或实施计划。
+- 已确认范围内直接推进，局部实现细节自行处理，不反复询问。实质未决选择、核心行为或范围变化先说明影响和建议，再取得确认；只暂停受影响部分。
 
-## 2. Think before acting
+## 2. 实现原则
 
-- Define the goal, constraints, impact, and verification before making changes.
-- Exercise independent judgment instead of defaulting to agreement. When the user's proposed approach is materially flawed, risky, internally inconsistent, or misaligned with their stated goal, challenge it respectfully, explain the concern, and recommend a better alternative. Do not object merely because another valid approach exists.
-- Inspect enough context to explain the intended change before editing.
-- When a requirement or technical choice cannot be determined confidently and would materially change the result, ask a focused question, include a recommendation, and wait for the user's decision.
-- For ordinary changes, explain how the code will change and how it will be verified, then wait for explicit confirmation.
-- For large changes, create one plan document as described below, then wait for explicit confirmation.
-- Require confirmation after presenting the current proposal or plan. The original implementation request is not confirmation of material the user has not seen.
-- Skip the plan format for pure explanations and simple lookups.
+- 只做当前需求需要的工作。每处修改应对应需求、必要测试或直接相关文档；不添加猜测性的功能、配置和扩展点。
+- 不为缺乏实际依据的低概率竞态或安全边界增加复杂度。确需扩展时，先说明触发条件、影响、发生可能性的依据及新增代码/维护成本，得到确认再做；不得悄悄扩大范围。已确认合同要求的并发、安全和隔离保证仍须落实。
+- 外部输入在各自信任边界完成校验，内部传递已验证的明确类型，避免逐层重复防御检查。HTTP、消息消费和第三方响应各有入口；这不替代各服务的鉴权、租户校验及数据库约束。
+- 不提前抽取只用一次的函数。只有存在复用、需要封装确实复杂的逻辑，或能表达清晰的领域概念时才抽取。
+- 主函数突出正常流程，必要的校验和实现细节放入职责明确的辅助函数；不为缩短主函数机械拆分，与上一条一并判断。
+- 注释说明不明显的约束、原因和反直觉行为，不复述显而易见的代码。
+- 自动生成的文件修改源头后重新生成，不直接手改产物。
+- 沿用现有目录、命名、组件和工具流程；不擅自引入仓库未使用的工具或工作流。只清理本次改动引入且已无用的代码。
 
-## 3. Keep changes simple and surgical
+## 3. 文档与计划
 
-- Implement only what the user requested. Do not add speculative features or configurability.
-- Avoid abstractions for one-off logic. Prefer fewer lines, fewer dependencies, and a smaller impact surface.
-- Modify only files and code directly relevant to the task.
-- Do not refactor adjacent modules, normalize unrelated formatting, or delete pre-existing dead code.
-- Match existing naming, structure, and style. Remove only unused code introduced by the current change.
+- 沿用项目已有文档目录、命名、导航和权威来源；每条规则只维护一处，其他文档引用，不复制另一套合同。
+- 大改动使用项目现有模板；无模板时使用 [实施计划模板](docs/plans/_plan-template.md)，保存为 `docs/plans/YYYY-MM-DD-主题-plan.md`，日期采用首次编制日期，修订不改名。普通修改无需另写计划。
+- 无专门约定时将本次设计与实施写在同一计划；项目已分离设计和实施计划时按其规则维护，不强制合并或拆分。
+- 计划必须能由未参与讨论的人执行；按模板核实基线、入口、关键合同、任务和验收，不把重要决定留给执行者补做。执行前核对相关事实，不重新设计已确认方案。
+- 文档授权不等于实现或部署授权。设计、计划、实现冲突时记录差异并暂停受影响工作，修订后按第 1 节确认；不静默覆盖或放宽验收。
+- 同步受影响的正文、导航和活跃计划；已完成计划保留当时基线与真实证据，不追改历史结果。项目协作入口使用 AGENTS.md。
 
-Every changed line must trace to the request, a required test, or a direct documentation update.
+## 4. 测试与交付
 
-## 4. Distinguish ordinary and large changes
+- 提前确定场景、输入和预期；完成当次实现后集中补写并运行测试，不每改一个函数就跑一遍。除非用户要求，不采用 TDD。
+- 新增或改变的可测试行为补充或更新单元测试。测试真实实现和可观察结果，不把业务逻辑复制到测试中；尽量少用 mock，仅在需要隔离外部依赖或制造失败条件时使用，不能据此声称真实集成已验证。
+- 只运行受影响的测试文件/用例及必要的类型检查、lint、构建；monorepo 限定到受影响模块。未经用户明确要求不跑全仓测试；范围无法确定时先确认，失败修复后只复验相关用例。
+- 不通过删除或禁用相关测试、放宽断言、修改正确预期来换取通过。
+- 纯文档、注释、格式、静态资源及不改变行为的配置无需新增单元测试，执行对应的链接、格式或构建检查即可。
+- 交付前对照确认范围复查；报告实际改动、验证命令、范围及原因、结果和剩余风险。区分已实现与已验证，未执行或受阻的检查说明原因，不用推测宣称完成。
+- 大改动只在阶段完成或重要发现出现时更新计划证据，不逐步骤堆日志。
 
-Treat a task as a large change when any condition applies:
+<!-- CODEGRAPH_START -->
+## 5. 代码检索
 
-- It spans three or more logical modules or services.
-- It changes architecture, core data flow, or module boundaries.
-- It changes a public API, database, authentication, authorization, build, or deployment behavior.
-- It requires migration, compatibility, staged rollout, or rollback planning.
-- It is a large refactor that can change existing behavior.
-- The user explicitly requests a design document or implementation plan.
+- 项目已配置 CodeGraph 时，结构问题优先使用它：符号定义、调用关系、执行链路和影响范围；字面文本搜索用 `rg`，已定位文件可直接读取。
+- 按问题选择入口，避免重复检索；普通代码解释直接查证，不为文件探索单独委派代理。不机械限制工具调用次数。
 
-Before coding a large change, create `docs/plans/YYYY-MM-DD-主题-plan.md` using the template in `docs/plans/`. Include the goal and scope, current state and constraints, chosen solution, impact surface, phased steps, verification and acceptance, risks and rollback, and an execution record.
+| 问题 | 优先工具 |
+| --- | --- |
+| 某个符号定义在哪里 | `codegraph_search` |
+| 模块上下文 / 多个相关符号源码 | `codegraph_context` / `codegraph_explore` |
+| 谁调用它 / 它调用谁 / 完整链路 | `codegraph_callers` / `codegraph_callees` / `codegraph_trace` |
+| 改动影响 / 单个符号详情 | `codegraph_impact` / `codegraph_node` |
+| 文件清单 / 索引状态 | `codegraph_files` / `codegraph_status` |
 
-Present the plan for explicit confirmation before implementation. Do not create separate design and implementation documents. If the plan or implementation reveals a material unresolved choice, pause, ask the user, update the plan, and obtain confirmation again.
-
-### 执行计划的交接标准
-
-- 面向未参与前期讨论的执行者编写。计划与指定仓库文件必须足以完成实现，不依赖聊天历史或规划者未写出的判断。
-- 不设固定页数。按行为复杂度细化，关键业务规则、模块职责、接口合同和核心算法必须在交接前确定；普通局部实现细节留给执行者。
-- 记录各受影响仓库的分支、HEAD 和相关未提交变更；提供经过核实的文件路径、符号及阅读目的。拟新增的路径和符号明确标注，不编造现有实现。
-- 使用 AC 编号表达可观察的验收结果。按独立行为和验证边界拆分 T 编号任务，写明依赖、仓库/文件/符号、具体改动、必要的逻辑或伪代码、必须保持的行为及完成证据；不要机械地按文件拆任务。
-- 涉及跨模块合同、状态、事务、并发、重试或取消时，明确生产者与消费者、检查及写入条件、失败后的状态和恢复方式。不适用时简述原因，不为填模板增加能力。
-- 提交确认前自检：每个 AC 都有实施任务和验证方法；每个任务都有明确入口；跨模块合同一致；关键失败路径和依赖已确定；不存在由执行者补做的重要设计决定。
-- 执行前只核对计划依赖的代码事实和相关变更，避免重新设计已确认方案。局部细节自行处理；若代码事实冲突或必须改变核心行为，记录具体差异、暂停受影响工作、修订计划并取得确认。不得静默改变方案或放宽验收。
-- 实施前确定测试场景、输入和预期结果；仍在实现完成后集中编写和运行相关测试。区分“已实现”与“已验证”，只用实际证据标记验收完成。
-
-## 5. Implement first, then test in one batch
-
-- Add or update unit tests for every new or changed testable behavior.
-- Finish all code for the current task before writing or updating tests.
-- Do not run tests after every class, function, file, or individual test.
-- Run only the test files, test cases, or filters directly related to the current change and its affected behavior.
-- In a monorepo, test only affected packages or workspaces unless a narrower selection is available.
-- Never run the complete project test suite unless the user explicitly requests it.
-- If the relevant test scope cannot be determined confidently, ask the user before expanding it.
-- Finish with applicable type checks, lint, and build.
-- During failure repair, rerun only the related focused tests.
-- Never delete tests, weaken assertions, disable relevant tests, or change a correct expectation merely to make tests pass.
-- Do not use TDD unless the user explicitly requests test-first development.
-
-Documentation, comments, formatting, static assets, and behavior-neutral configuration changes do not require new unit tests, but still require applicable checks. Report the exact tests run, why they were selected, and any related behavior not verified. When related tests cannot run, explain why and state the unverified scope.
-
-## 6. Complete and report
-
-- Compare the result with the confirmed change proposal or plan document.
-- Report actual changes, test commands, real results, and remaining risks.
-- For large changes, update the plan only at meaningful phase boundaries or when material findings change it.
-- State anything not verified. Do not claim completion based on assumption.
+- 索引正常且结果充分时不重复查证；索引不可用、过期、覆盖不足或与源码矛盾时，回到源码核实并说明限制。写入后留出索引更新时间。
+- 项目已配置 CodeGraph 但 `.codegraph/` 不存在或工具报告未初始化时，先询问是否执行 `codegraph init -i`；未获同意不初始化，可用原生搜索继续只读检查。
+<!-- CODEGRAPH_END -->
